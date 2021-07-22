@@ -1,0 +1,22 @@
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.dropzone {
+  background: #e3e6ff;
+  color: black;
+  border-radius: 13px;
+  max-width: 550px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 2px #1833ff;
+  margin-top: 50px;
+}
