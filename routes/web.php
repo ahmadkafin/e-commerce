@@ -1,9 +1,8 @@
 <?php
 
+use App\Http\Controllers\DiscountCont;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProductsCont;
-use App\Http\Controllers\ImagesController;
-
+use App\Models\Products;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,15 +31,15 @@ Route::prefix('dashboard')->group(function () {
 Route::prefix('produk')->group(function () {
     // products
     Route::get('/', function () {
-        $title = 'Product';
-        $home = 'Product';
+        $title = 'Products';
+        $home = 'Products';
         $routes = 'dashboard.products';
         return view('content.admin.products', compact(['title', 'routes', 'home']));
     })->name('dashboard.products');
 
     Route::get('create', function () {
         $title = 'Add Product';
-        $home = 'Product';
+        $home = 'Products';
         $routes = 'dashboard.products';
         return view('content.admin.productsCreate', compact(['title', 'routes', 'home']));
     })->name('dashboard.products.create');
@@ -52,8 +51,40 @@ Route::prefix('produk')->group(function () {
 
     Route::get('/{sku}/edit', function () {
         $title = 'Edit Product';
-        $home = 'Product';
+        $home = 'Products';
         $routes = 'dashboard.products';
         return view('content.admin.productsEdit', compact(['title', 'routes', 'home']));
     })->name('dashboard.products.edit');
+
+    Route::get('images', function () {
+        $title = "Image Products";
+        $home = "Products";
+        $routes = "dashboard.products";
+        $datas  = Products::select('id', 'nama', 'sku')->with(['images'])->get();
+        return view('content.admin.images', compact(['title', 'routes', 'home', 'datas']));
+    })->name('dashboard.images');
+
+    Route::get('collections', function () {
+        $title = "Collections";
+        $home = "Products";
+        $routes = "dashboard.products";
+        return view('content.admin.collections', compact(['title', 'routes', 'home']));
+    })->name('dashboard.collections');
+
+    Route::get('discounts', function () {
+        $title = "Discounts";
+        $home = "Products";
+        $routes = "dashboard.products";
+        return view('content.admin.discount', compact(['title', 'routes', 'home']));
+    })->name('dashboard.discount');
+
+    Route::get('discounts/create', function () {
+        $title = "Create Discount";
+        $home = "Discounts";
+        $routes = "dashboard.discount";
+        $datas  = Products::select('id', 'nama', 'sku', 'harga')->with(['images'])->orderBy('created_at', 'desc')->get();
+        return view('content.admin.discount-create', compact(['title', 'routes', 'home', 'datas']));
+    })->name('dashboard.discount.create');
+
+    Route::get('discounts/edit/{sku}', [DiscountCont::class, 'edit'])->name('dashboard.discount.edit');
 });

@@ -29,18 +29,18 @@
                             @csrf
                             <div class="row">
                                 <div class="row">
-                                    <div class="col-lg-4 col-md-4 col-sm-12">
+                                    <div class="col-lg-12 col-md-12 col-sm-12">
                                         <div class="form-group">
                                             <label for="sku">Nomor SKU</label>
                                             <div class="input-group mb-3">
-                                                <input type="text" class="form-control" id="sku" name="sku"
+                                                <input type="number" class="form-control" id="sku" name="sku"
                                                     placeholder="SKU">
-                                                <small class="form-text text-danger" id="name-error"></small>
                                                 <div class="input-append">
                                                     <button class="btn btn-info" id="reset_sku" disabled>Reset
                                                         SKU</button>
                                                 </div>
                                             </div>
+                                            <small class="form-text text-danger" id="name-error"></small>
                                         </div>
                                     </div>
                                 </div>
@@ -53,7 +53,7 @@
                                             <input type="text" class="form-control" id="nama" name="nama"
                                                 placeholder="Nama Produk">
                                             <small class="form-text text-muted">Nama Produk</small>
-                                            <small class="form-text text-danger" id="name-error"></small>
+                                            <small class="form-text text-danger" id="nama-error"></small>
                                         </div>
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-sm-12">
@@ -68,6 +68,17 @@
                                     </div>
                                     <div class="col-lg-6 col-md-6 col-sm-12">
                                         <div class="form-group">
+                                            <label for="collections">Collections</label>
+                                            <select name="collection" id="collections"
+                                                class="form-control js-example-basic-multiple">
+                                                <option selected disabled>Pilih</option>
+                                            </select>
+                                            <small class="form-text text-muted">Collections</small>
+                                            <small class="form-text text-danger" id="collections-error"></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-6 col-md-6 col-sm-12">
+                                        <div class="form-group">
                                             <label for="harga">Harga Produk</label>
                                             <input type="number" class="form-control" id="harga" name="harga"
                                                 placeholder="Harga">
@@ -75,25 +86,10 @@
                                             <small class="form-text text-danger" id="harga-error"></small>
                                         </div>
                                     </div>
-                                    <div class="col-lg-6 col-md-6 col-sm-12">
-                                        <div class="form-group">
-                                            <label for="_isDiscount">Discount?</label>
-                                            <input type="checkbox" class="form-check-input" id="_isDiscount"
-                                                name="_isDiscount" style="margin-left: 3px;">
-                                            <div class="input-group">
-                                                <input type="number" class="form-control" id="discount" name="_discount"
-                                                    placeholder="Discount">
-                                                <div class="input-group-prepend">
-                                                    <span class="input-group-text">%</span>
-                                                </div>
-                                            </div>
-                                            <small class="form-text text-muted">Discount </small>
-                                            <small class="form-text text-danger" id="slugs-error"></small>
-                                        </div>
-                                    </div>
                                     <div class="col-lg-12 col-md-12 col-sm-12">
                                         <div id="body" style="height: 500px" style="background: white"></div>
                                         <textarea name="deskripsi" hidden id="deskripsi"></textarea>
+                                        <small class="form-text text-danger" id="deskripsi-error"></small>
                                     </div>
                                 </div>
                                 <hr style="width: 95%">
@@ -129,7 +125,19 @@
                             </div>
                     </div>
                     <hr style="width: 100%">
-                    <button type="submit" class="btn btn-primary" id="add-product">Submit</button>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 col-lg-6">
+                            <button type="submit" class="btn btn-primary btn-block" id="add-product">
+                                <i class="fa fa-spinner fa-spin d-none" id="spins"></i>
+                                Submit
+                            </button>
+                        </div>
+                        <div class="col-sm-12 col-md-6 col-lg-6">
+                            <a href="#" class="btn btn-danger btn-block">
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
                     </form>
                 </div>
             </div>
@@ -154,7 +162,6 @@
                     <ul class="nav nav-pills p-2">
                         <li class="nav-item"><a class="nav-link active" href="#uimage" data-toggle="tab">Upload
                                 Images</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#imgs" data-toggle="tab">Images</a></li>
                     </ul>
                 </div>
                 <div class="modal-body" id="mod-body">
@@ -171,10 +178,6 @@
                                             Associate this image with this products
                                         </label>
                                     </div>
-                                </div>
-                                <!-- /.tab-pane -->
-                                <div class="tab-pane" id="imgs">
-                                    image
                                 </div>
                             </div>
                         </div>
@@ -194,18 +197,23 @@
 @push('scripts')
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script>
-    var config = {
+    var config = { 
             data: {
                 _token: "{{ csrf_token() }}",
                 _img: "{{ asset('img/products/:data') }}"
             },
             routes: {
+                index: "{{route('dashboard.products')}}"
                 store: "{{ route('products.store') }}",
+                slugs: "{{route('products.slug')}}",
                 checks: "{{ route('products.cks') }}",
+                images: "{{route('images.getAll')}}",
                 getImage: "{{ route('images.get') }}",
-                postImage: "{{ route('images.store') }}"
+                postImage: "{{ route('images.store') }}",
+                collections: "{{ route('collections.index') }}"
             }
         }
+
 </script>
 <script src="https://unpkg.com/quill-image-compress@1.2.11/dist/quill.imageCompressor.min.js"></script>
 <script src="{{ asset('js/dropzoneU.js') }}"></script>

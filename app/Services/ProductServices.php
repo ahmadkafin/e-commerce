@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\ProductCollection;
 use App\Repositories\ProductRepo;
 use App\Repositories\SizeProductRepo;
 use Exception;
@@ -30,12 +31,18 @@ class ProductServices extends ProductRepo
                     'error'     => $err
                 ]);
             }
+
+            // init for total on product table
             $sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
             $total = 0;
             for ($i = 0; $i < count($sizes); $i++) {
                 $total += $request->size[$i];
             }
+
+            // insert into product table
             $this->createProduct($this->dataPayload($request, $total));
+
+            // insert into size table
             for ($i = 0; $i < count($sizes); $i++) {
                 $data  = [
                     'uid_skuP' => $request->sku,
@@ -45,11 +52,18 @@ class ProductServices extends ProductRepo
                 $size->createSize($data);
             }
 
+            //insert into image table
             $imageID    = $request->imageID;
             for ($i = 0; $i < count($imageID); $i++) {
                 $data       = ['uid_products' => $request->sku];
                 $image->updateImage($imageID[$i], $data);
             }
+
+            // insert into collection
+            ProductCollection::create([
+                'fid_prod'          => $request->sku,
+                'fid_col'           => $request->collection
+            ]);
             DB::commit();
             return response()->json([
                 'status'    => 200,
@@ -83,11 +97,17 @@ class ProductServices extends ProductRepo
                     'error'     => $err
                 ]);
             }
+
+            // init total on product table
             $sizes = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
             for ($i = 0; $i < count($sizes); $i++) {
                 $total += $request->size[$i];
             }
+
+            // update to product table
             $this->updateProduct($this->dataPayload($request, $total), $sku);
+
+            // update to size table
             for ($i = 0; $i < count($sizes); $i++) {
                 $data  = [
                     'uid_skuP' => $request->sku,
@@ -97,11 +117,20 @@ class ProductServices extends ProductRepo
                 $size->createSize($data);
                 $total += $size[$i];
             }
+
+            // Image update
             $imageID    = $request->imageID;
             for ($i = 0; $i < count($imageID); $i++) {
                 $data       = ['uid_products' => $request->sku];
                 $image->updateImage($imageID[$i], $data);
             }
+
+            // insert into collection
+            ProductCollection::create([
+                'fid_prod'          => $request->sku,
+                'fid_collection'    => $request->collection
+            ]);
+
             DB::commit();
             return response()->json([
                 'status'    => 200,
@@ -144,7 +173,6 @@ class ProductServices extends ProductRepo
             'total'         => $size,
             'harga'         => $request->harga,
             'deskripsi'     => $request->deskripsi,
-            '_isDiscount'   => $request->_isDiscount,
         ];
     }
 

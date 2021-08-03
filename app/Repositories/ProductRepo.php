@@ -1,10 +1,13 @@
 <?php
+
 namespace App\Repositories;
 
 use App\Models\Products;
 use App\Services\ModelService;
+use Cviebrock\EloquentSluggable\Services\SlugService;
 
-class ProductRepo  {
+class ProductRepo
+{
     /**
      * this class for take data from products table
      */
@@ -46,7 +49,8 @@ class ProductRepo  {
      * @param string $sku
      * @return void
      */
-    public function updateProduct(array $data, string $sku) {
+    public function updateProduct(array $data, string $sku)
+    {
         $update = $this->_service->update($this->products, 'sku', $sku, $data);
         return $update;
     }
@@ -55,13 +59,20 @@ class ProductRepo  {
      * @param $sku
      * @return void
      */
-    public function deleteProduct(string $sku) {
+    public function deleteProduct(string $sku)
+    {
         $delete = $this->_service->delete($this->products, 'sku', $sku);
         return $delete;
     }
 
-    public function ck($sku){
+    public function ck($sku)
+    {
         return Products::where('sku', $sku)->first();
+    }
 
+    public function slugs($request)
+    {
+        $slug = SlugService::createSlug($this->products, 'slugs', $request->nama);
+        return $slug;
     }
 }

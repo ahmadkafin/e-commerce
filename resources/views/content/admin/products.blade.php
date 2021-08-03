@@ -22,6 +22,25 @@
                                 </div>
                             </div>
                         </div>
+                        <form id="form-import">
+                            @csrf
+                            <div class="row mt-3">
+                                <div class="col-sm-10 col-md-10 col-lg-10">
+                                    <div class="form-group">
+                                        <label for="excel">Upload data CSV / XLSX</label>
+                                        <input type="file" name="excel" id="excel" class="form-control" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 col-md-2 col-lg-2">
+                                    <div class="form-group">
+                                        <label for="excel">&nbsp;</label>
+                                        <button type="submit" class="btn btn-info btn-block" id="btn-import">
+                                            <i class="fa fa-spinner fa-spin d-none" id="spins"></i> Submit
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                     <div class="card-body">
                         <table id="products-data" class="table table-bordered table-hover">
@@ -34,28 +53,12 @@
                                     <th>Warna</th>
                                     <th>Jumlah</th>
                                     <th>Harga</th>
-                                    <th>Discount</th>
                                     <th>Aksi</th>
-                                    <th>Discount</th>
                                 </tr>
                             </thead>
                             <tbody>
 
                             </tbody>
-                            <tfoot>
-                                <tr>
-                                    <th>No</th>
-                                    <th>images</th>
-                                    <th>sku</th>
-                                    <th>Nama</th>
-                                    <th>Warna</th>
-                                    <th>Jumlah</th>
-                                    <th>Harga</th>
-                                    <th>Discount</th>
-                                    <th>Aksi</th>
-                                    <th>Discount</th>
-                                </tr>
-                            </tfoot>
                         </table>
                     </div>
                 </div>
@@ -99,12 +102,10 @@
 @push('scripts')
 <!-- DataTables  & Plugins -->
 <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
-<script src="{{ asset('adminLTE/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('adminLTE/plugins/datatables-responsive/js/dataTables.responsive.min.js') }}"></script>
 <script src="{{ asset('adminLTE/plugins/datatables-responsive/js/responsive.bootstrap4.min.js') }}"></script>
-<script src="{{ asset('adminLTE/plugins/datatables-buttons/js/dataTables.buttons.min.js') }}"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap4.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
-<script src="{{ asset('js/dataTables.editor.min.js') }}"></script>
 <script src="https://cdn.datatables.net/plug-ins/1.10.15/dataRender/datetime.js"></script>
 <script src="https://cdn.datatables.net/plug-ins/1.10.19/sorting/datetime-moment.js"></script>
 <script>
@@ -115,7 +116,9 @@
             },
             routes: {
                 index: "{{ route('products.index') }}",
-                edit: "{{ route('dashboard.products.edit', ':id') }}"
+                edit: "{{ route('dashboard.products.edit', ':id') }}",
+                delete: "{{ route('products.destroy', ':id') }}",
+                import: "{{route('products.import')}}",
             }
         }
 </script>

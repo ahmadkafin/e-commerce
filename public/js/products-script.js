@@ -1,6 +1,7 @@
 let path = window.location.pathname.split("/");
 let idProduct = path[3];
 const isDisc = document.getElementById("_isDiscount");
+
 var productsTB = $("#products-data").DataTable({
     processing: true,
     serverSide: false,
@@ -8,7 +9,7 @@ var productsTB = $("#products-data").DataTable({
         url: config.routes.index,
         dataSrc: "products",
     },
-    order: [[9, "desc"]],
+    order: [[8, "desc"]],
     responsive: true,
     lengthChange: true,
     autoWidth: false,
@@ -66,21 +67,20 @@ var productsTB = $("#products-data").DataTable({
                 var xxxl =
                     data == null ? 0 : data == "" ? 0 : row.ukurans[5].jumlah;
                 return `<button type="button" class="btn btn-primary shwModal" onclick=hs(this) id="sacaa" data-nama="${row.nama}" data-s="${s}" data-m="${m}" data-l="${l}" data-xl="${xl}" data-xxl="${xxl}" data-xxxl="${xxxl}"> 
-                            ${row.total}
-                        </button>`;
+                                ${row.total}
+                            </button>`;
             },
         },
         {
             data: "harga",
             render: $.fn.dataTable.render.number(",", ".", 0, "IDR "),
         },
-        { data: "_discount" },
         {
             data: "sku",
             render: function (data) {
                 var routeEdit = config.routes.edit;
                 routeEdit = routeEdit.replace(":id", data);
-                return `<div id="buttons" class="d-grid gap-2 d-md-block"><a href="${routeEdit}" class="btn btn-info btn-block btn-sm" type="button"><i class="fas fa-pencil-alt"></i>&nbsp; Edit</a><button class="delete-artikel btn btn-danger my-2 btn-block btn-sm" onclick="" type="button"><i class="fas fa-trash-alt"></i>&nbsp; Delete</button>`;
+                return `<div id="buttons" class="d-grid gap-2 d-md-block"><a href="${routeEdit}" class="btn btn-info btn-block btn-sm" type="button"><i class="fas fa-pencil-alt"></i>&nbsp; Edit</a><button onclick=deleteProduct(this) class="delete-products btn btn-danger my-2 btn-block btn-sm" data-id="${data}" type="button"><i class="fas fa-trash-alt"></i>&nbsp; Delete</button></div>`;
             },
         },
         {
@@ -122,3 +122,51 @@ function hs(x) {
 
     $("#modSize").modal("show");
 }
+
+function deleteProduct(x) {
+    var id = x.getAttribute("data-id");
+    var _url = config.routes.delete;
+    _url = _url.replace(":id", id);
+    var cnfrm = confirm("Apakah artikel ini akan di hapus?");
+    if (cnfrm === true) {
+        $.ajax({
+            url: _url,
+            type: "DELETE",
+            success: function (data) {
+                if (data.status === 200) {
+                    alert(`Sukses! ${data.msg} dengan status : ${data.status}`);
+                    productsTB.ajax.reload();
+                }
+            },
+        });
+    }
+}
+const formImport = document.getElementById("form-import");
+formImport.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const spinner = document.getElementById("spins");
+    let formData = new FormData(formImport);
+
+    $.ajax({
+        url: config.routes.import,
+        method: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        beforeSend: function () {
+            spinner.classList.remove("d-none");
+            spinner.classList.add("d-inline-block");
+            $("#btn-import").prop("disabled", true);
+        },
+        success: function (resp) {
+            if (resp.status === 200) {
+                spinner.classList.remove("d-inline-block");
+                spinner.classList.add("d-none");
+                $("#btn-import").prop("disabled", false);
+                productsTB.ajax.reload();
+                formImport.reset();
+                alert("Sukses menambahkan produk");
+            }
+        },
+    });
+});

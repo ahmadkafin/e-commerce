@@ -1,7 +1,6 @@
 var id = [];
 var ids = [];
 var testID = [];
-console.log(typeof id);
 Dropzone.options.uploadImage = {
     paramName: "file", // The name that will be used to transfer the file
     url: config.routes.postImage,
@@ -66,7 +65,7 @@ function getImage() {
                 imgProd.innerHTML += `
                         <div class="col-md-3 col-lg-3 col-sm-12 mt-4">
                             <img src="${img}" alt="${data.data[i].image_name}" class="img-fluid"/>
-                            <input type="text" name="imageID[]" value="${data.data[i].id}"/>
+                            <input type="text" name="imageID[]" value="${data.data[i].id}" hidden/>
                         </div>
                 `;
             }

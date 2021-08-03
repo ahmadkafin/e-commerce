@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Imports\ProductsImport;
 use App\Repositories\ProductRepo;
 use App\Services\ProductServices;
+use Cviebrock\EloquentSluggable\Services\SlugService;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductsCont extends Controller
 {
@@ -89,7 +92,7 @@ class ProductsCont extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, ProductServices $productService , $sku)
+    public function update(Request $request, ProductServices $productService, $sku)
     {
         $p = $productService->dataUpdate($request, $sku);
         return $p;
@@ -104,27 +107,49 @@ class ProductsCont extends Controller
     public function destroy($id)
     {
         try {
-            $this->_productRepo->findProduct('sku', $id);
+            $data = $this->_productRepo->findProduct('sku', $id);
             $this->_productRepo->deleteProduct($id);
             return response()->json([
                 'status'    => 200,
-                'msg'       => 'ok'
+                'msg'       => $data->nama . ' berhasil di hapus'
             ]);
-        } catch(ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'status'    => 404,
                 'msg'       => 'Data tidak ditemukan, apakah nomor sku benar?'
             ]);
-        }  
+        }
     }
 
-    public function checks(Request $request){
+    public function checks(Request $request)
+    {
         $sku = $request->sku;
         $rp = $this->_productRepo->ck($sku);
-        if($rp) {
-            return response()->json(['msg'   => 'duplicate']);
+        if ($rp) {
+            return response()->json([
+                'msg'   => 'duplicate',
+            ]);
         } else {
-            return response()->json(['msg'   => 'aman']);
+            return response()->json([
+                'msg'   => 'aman',
+            ]);
         }
+    }
+
+    public function slugs(Request $request)
+    {
+        $slug = $this->_productRepo->slugs($request);
+        return response()->json([
+            'slug' => $slug
+        ]);
+    }
+
+    public function import(Request $request)
+    {
+        $excel = Excel::import(new ProductsImport, $request->file('excel'));
+        return response()->json([
+            'status'    => 200,
+            'msg'       => "OK"
+        ]);
     }
 }

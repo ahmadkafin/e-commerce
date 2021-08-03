@@ -11,12 +11,13 @@ class ImagesController extends Controller
     private $_imageRepo;
     public function __construct()
     {
-        $imageRepo = new ImageProdRepo; 
+        $imageRepo = new ImageProdRepo;
         $this->_imageRepo = $imageRepo;
     }
 
 
-    public function index(){
+    public function index()
+    {
         $images = $this->_imageRepo->getImage();
         return response()->json([
             'status'    => 200,
@@ -24,7 +25,8 @@ class ImagesController extends Controller
         ]);
     }
 
-    public function store(Request $request){
+    public function store(Request $request)
+    {
         $imServ = new ImageProdServices();
         $id = $imServ->imageCreate($request);
         return response()->json([
@@ -43,5 +45,12 @@ class ImagesController extends Controller
             'status'    => 200,
             'data'      => $images
         ]);
+    }
+
+    public function update(Request $request)
+    {
+        $srv = new ImageProdServices();
+        $image = $srv->imageUpdate($request);
+        return $image;
     }
 }
